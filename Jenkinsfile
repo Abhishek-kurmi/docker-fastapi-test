@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/Abhishek-kurmi/docker-fastapi-test.git'
+                git branch: 'main', credentialsId: 'github', url: 'https://github.com/Abhishek-kurmi/docker-fastapi-test.git'
             }
         }
 
