@@ -8,19 +8,21 @@ pipeline {
             }
         }
 
-        stage('Build and Package') {
+         stage('Build Docker Image') {
             steps {
-                sh 'docker build -t your-fastapi-app .'
-                sh 'docker save -o your-fastapi-app.tar your-fastapi-app'
+                script {
+                    def dockerImage = docker.build('fastapi-app:fastapi-app', '.')
+            
+                }
             }
         }
-
-        stage('Deploy') {
-            steps {
-                sh 'scp your-fastapi-app.tar user@your-server:/path/to/destination'
-                sh 'ssh user@your-server "docker load -i /path/to/destination/your-fastapi-app.tar"'
-                sh 'ssh user@your-server "docker-compose -f /path/to/your/docker-compose.yml up -d"'
-            }
-        }
+stage('Deploy') {
+    steps {
+        bat 'plink root@ec2-18-206-123-165.compute-1.amazonaws.com "mkdir -p /tmp/fastapi"'
+		bat 'scp docker-compose.yml root@ec2-18-206-123-165.compute-1.amazonaws.com: /tmp/fastapi'
+        bat 'plink root@ec2-18-206-123-165.compute-1.amazonaws.com "cd /tmp/fastapi && docker-compose pull"'
+        bat 'plink root@ec2-18-206-123-165.compute-1.amazonaws.com "cd /tmp/fastapi && docker-compose up -d"'
+    }
+}
     }
 }
